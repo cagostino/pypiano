@@ -2,247 +2,95 @@ import pyglet
 from pyglet.window import key
 from pyglet import image
 import time
-regular_notes = {'a': 'a4.wav','b':'b4.wav','c4':'c4.wav','d':'d4.wav','e':'e4.wav','f':'f4.wav','g':'g4.wav','c5':'c5.wav'}
-sharps = {'asharp':'a#.wav','csharp':'c#.wav','dsharp':'d#.wav','fsharp':'f#.wav','gsharp':'g#.wav'}
+regular_notes = ['c4.wav','d4.wav','e4.wav','f4.wav','g4.wav','a4.wav','b4.wav','c5.wav']
+sharps = ['c#.wav','d#.wav','f#.wav','g#.wav','a#.wav']
 los_keys = ['white-key.png', 'white-key-down.png', 'black-key.png', 'black-key-down.png']
 
 white = pyglet.resource.image(los_keys[0])
 white_down = pyglet.resource.image(los_keys[1])
 black = pyglet.resource.image(los_keys[2])
 black_down =pyglet.resource.image(los_keys[3])
-window= pyglet.window.Window(8*white.width,white.height)
 
-@window.event
-def on_draw():
-    window.clear()  
-    for i in range(len(regular_notes.keys())):
-        white.blit(i*white.width,0)
+window = pyglet.window.Window(8*white.width, white.height)
+class Piano(object):
+    def __init__(self, natural_notes, sharp_notes):
+        self.natural_notes = natural_notes
+        self.sharp_notes = sharp_notes
+    def play_piano(self):
+        """This function contains all the regular piano functions."""
+        def draw_regular_down(index_key):
+            """This draws whichever regular key has been pressed down"""
+            @window.event
+            def on_draw():
+                window.clear()
+                for i in range(len(self.natural_notes)):
+                    if i == index_key:
+                        white_down.blit(i*white.width,0)
+                    else:
+                        white.blit(i*white.width,0)
+                for i in range(len(self.sharp_notes)):
+                    if i <2:
+                        black.blit(i*white.width+3*white.width/4,117)
+                    else:
+                        black.blit(i*white.width+7*white.width/4,117)
+        def draw_sharp_down(index_key):
+            """This draws whichever sharp key has been pressed down"""
+            @window.event
+            def on_draw():
+                window.clear()
+                for i in range(len(self.natural_notes)):
+                    white.blit(i*white.width,0)
+                for i in range(len(self.sharp_notes)):
+                    if i == index_key and i <2:
+                            black_down.blit(3*white.width/4 +white.width*i,117)
+                    elif i == index_key:
+                        black_down.blit(7*white.width/4+white.width*i,117)
+                    elif i<2:
+                        black.blit(i*white.width+3*white.width/4,117)
+                    else:
+                        black.blit(i*white.width+7*white.width/4,117)
+        def draw_board():
+            """ This homie just draws the initial board."""
+            @window.event
+            def on_draw():
+                window.clear()  
+                for i in range(len(self.natural_notes)):
+                    white.blit(i*white.width,0)
+                for i in range(len(self.sharp_notes)):
+                    if i >= 2:
+                        black.blit(7*white.width/4.+i*white.width,117 )
+                    else:
+                        black.blit(3*white.width/4 + white.width*i,117)
+        draw_board()
+        def play_song(self,somelist):
+            """Given some arbitrary list of key combos it can play a simple piano tune."""
+            if not somelist:
+                return
+            on_key_press(somelist[0],0)
+            time.sleep(.19)
+            return play_song(self,somelist[1:])
+        play_song(self,clocks)
+        @window.event
+        def on_key_press(symbol, modifiers):
+            """Ay you know this homie about to be playing the notes when you hit the correct keys 
+            and then it draws the piano again to make it look like the key is young pressed down ay"""
 
-    for i in range(len(sharps.keys())):
-        if i >= 2:
-            black.blit(7*white.width/4.+i*white.width,117 )
-        else:
-            black.blit(3*white.width/4 + white.width*i,117)
-@window.event
-def on_key_press(symbol, modifiers):
-    if symbol == key.A:
-        pyglet.resource.media(regular_notes['c4']).play()
+            useful_regular_keys = [key.A,key.S, key.E, key.D, key.F, key.G, key.H, key.J, key.K]
+            useful_sharp_keys = [key.W, key.E, key.T, key.Y, key.U]
+            if symbol in useful_regular_keys:
+                draw_regular_down(useful_regular_keys.index(symbol))
+                pyglet.resource.media(self.natural_notes[useful_regular_keys.index(symbol)])
+            if symbol in useful_sharp_keys:
+                draw_sharp_down(useful_sharp_keys.index(symbol))
+                pyglet.resource.media(self.natural_notes[useful_sharp_keys.index(symbol)])
         @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==0:
-                    white_down.blit(0,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-
-    if symbol == key.W:
-        pyglet.resource.media(sharps['csharp']).play()
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >=2:
-                    black.blit(7*white.width/4.+i*white.width,117)
-                elif i==0:
-                    black_down.blit(3*white.width/4,117)
-                else:
-                    black.blit(3*white.width/4+white.width*i,117)
-    if symbol == key.S:
-        pyglet.resource.media(regular_notes['d']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==1:
-                    white_down.blit(white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.E:
-        pyglet.resource.media(sharps['dsharp']).play()
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >=2:
-                    black.blit(7*white.width/4.+i*white.width,117)
-                elif i==1:
-                    black_down.blit(3*white.width/4+i*white.width,117)
-                else:
-                    black.blit(3*white.width/4+white.width*i,117)
-    if symbol == key.D:
-        pyglet.resource.media(regular_notes['e']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==2:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.F:
-        pyglet.resource.media(regular_notes['f']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==3:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.T:
-        pyglet.resource.media(sharps['fsharp']).play()
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >2:
-                    black.blit(7*white.width/4.+i*white.width,117)
-                elif i==2:
-                    black_down.blit(7*white.width/4+i*white.width,117)
-                else:
-                    black.blit(3*white.width/4+white.width*i,117)
-    if symbol == key.G:
-        pyglet.resource.media(regular_notes['g']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==4:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.Y:
-        pyglet.resource.media(sharps['gsharp']).play()
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i <2:
-                    black.blit(3*white.width/4.+i*white.width,117)
-                elif i==3:
-                    black_down.blit(7*white.width/4+i*white.width,117)
-                else:
-                    black.blit(7*white.width/4+white.width*i,117)
-    if symbol == key.H:
-        pyglet.resource.media(regular_notes['a']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==5:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.U:
-        pyglet.resource.media(sharps['asharp']).play()
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i <2:
-                    black.blit(3*white.width/4.+i*white.width,117)
-                elif i==4:
-                    black_down.blit(7*white.width/4+i*white.width,117)
-                else:
-                    black.blit(7*white.width/4+white.width*i,117)
-    if symbol == key.J:
-        pyglet.resource.media(regular_notes['b']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==6:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-    if symbol == key.K:
-        pyglet.resource.media(regular_notes['c5']).play()
-        @window.event
-        def on_draw():
-            window.clear()
-            for i in range(len(regular_notes.keys())):
-                if i ==7:
-                    white_down.blit(i*white.width,0)
-                else:
-                    white.blit(i*white.width,0)
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)
-@window.event
-def on_key_release(symbol, modifiers):
-    useful_keys = [key.A, key.S, key.W, key.E, key.D, key.F,key.G,key.T,key.H,key.Y,key.U,key.J, key.K]
-    if symbol in useful_keys:
-        @window.event
-        def on_draw():
-            window.clear()  
-            for i in range(len(regular_notes.keys())):
-                white.blit(i*white.width,0)
-
-            for i in range(len(sharps.keys())):
-                if i >= 2:
-                    black.blit(7*white.width/4.+i*white.width,117 )
-                else:
-                    black.blit(3*white.width/4 + white.width*i,117)    
+        def on_key_release(symbol, modifiers):
+            """This function redraws the board after a key has been released so it looks normal again"""
+            useful_keys = [key.A, key.S, key.W, key.E, key.D, key.F,key.G,key.T,key.H,key.Y,key.U,key.J, key.K]
+            if symbol in useful_keys:
+                draw_board()
+        
 clocks = [101,117,103,101,117,103,101,117,119,117,102,97,117,116,119,117,119,117,102,119,117,102,119,117,97,121,102,97,121,102,97,121]
-def play_song(somelist):
-    if not somelist:
-        return
-    on_key_press(somelist[0],0)
-    time.sleep(.19)
-    return play_song(somelist[1:])
-
+new_piano = Piano(regular_notes, sharps)
+new_piano.play_piano()
 pyglet.app.run()
-
-play_song(clocks)
-play_song(clocks)
-play_song(clocks)
-play_song(clocks)
