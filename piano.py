@@ -72,9 +72,6 @@ class Piano(object):
         play_song(self,clocks)
         @window.event
         def on_key_press(symbol, modifiers):
-            """Ay you know this homie about to be playing the notes when you hit the correct keys 
-            and then it draws the piano again to make it look like the key is young pressed down ay"""
-
             useful_regular_keys = [key.A,key.S, key.E, key.D, key.F, key.G, key.H, key.J, key.K]
             useful_sharp_keys = [key.W, key.E, key.T, key.Y, key.U]
             if symbol in useful_regular_keys:
