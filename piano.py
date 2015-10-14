@@ -50,7 +50,6 @@ class Piano(object):
                     else:
                         black.blit(i*white.width+7*white.width/4,117)
         def draw_board():
-            """ This homie just draws the initial board."""
             @window.event
             def on_draw():
                 window.clear()  
