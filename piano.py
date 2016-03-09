@@ -68,7 +68,6 @@ class Piano(object):
             on_key_press(somelist[0],0)
             time.sleep(.19)
             return play_song(self,somelist[1:])
-        play_song(self,clocks)
         @window.event
         def on_key_press(symbol, modifiers):
             useful_regular_keys = [key.A,key.S, key.E, key.D, key.F, key.G, key.H, key.J, key.K]
